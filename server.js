@@ -1,10 +1,10 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve HTML, CSS, JS files
 app.use(express.static(__dirname));
 
 const db = new sqlite3.Database("fuel.db");
@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS fuel_status (
 )
 `);
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 app.get("/update_fuel", (req, res) => {
   const total = parseInt(req.query.total_fuel || "1000");
   const available = parseInt(req.query.available_fuel || "0");
@@ -27,10 +31,7 @@ app.get("/update_fuel", (req, res) => {
     [total, available],
     function (err) {
       if (err) {
-        return res.json({
-          status: "error",
-          message: err.message
-        });
+        return res.json({ status: "error", message: err.message });
       }
 
       res.json({
@@ -48,10 +49,7 @@ app.get("/get_fuel", (req, res) => {
     [],
     (err, row) => {
       if (err) {
-        return res.json({
-          status: "error",
-          message: err.message
-        });
+        return res.json({ status: "error", message: err.message });
       }
 
       if (!row) {
