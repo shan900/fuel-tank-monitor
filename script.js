@@ -2,7 +2,7 @@
 let maxFuel = 0;
 let availableFuel = 0;
 let currentLang = "en";
-let intervalTime = 5000; // 5 sec language switch
+let intervalTime = 5000;
 
 // TRANSLATE & UPDATE UI
 function translateUI() {
@@ -16,13 +16,11 @@ function translateUI() {
     const progressBarEl = document.getElementById("progressBar");
     const statusEl = document.getElementById("status");
 
-    // Reset red class first
     titleEl.classList.remove("red-text");
 
-    // Show warning if Available Fuel is zero
     if (availableFuel <= 0) {
         titleEl.innerText = currentLang === "en" ? "Fuel Empty" : "তেল শেষ";
-        titleEl.classList.add("red-text"); // ✅ title red
+        titleEl.classList.add("red-text");
 
         labelTotalEl.innerText = "";
         totalValueEl.innerText = "";
@@ -36,19 +34,19 @@ function translateUI() {
     if (currentLang === "en") {
         titleEl.innerText = "Fuel Tank Monitor";
         labelTotalEl.innerText = "Total Fuel";
-        totalValueEl.innerText = formatLiters(maxFuel) + " L";
+        totalValueEl.innerText = formatLiters(maxFuel) + " ml";
 
         labelAvailableEl.innerText = "Available Fuel";
-        availableValueEl.innerText = formatLiters(availableFuel) + " L";
+        availableValueEl.innerText = formatLiters(availableFuel) + " ml";
 
         statusEl.innerText = "System Running...";
     } else {
         titleEl.innerText = "জ্বালানি ট্যাংক মনিটর";
         labelTotalEl.innerText = "মোট জ্বালানি";
-        totalValueEl.innerText = formatBangla(maxFuel) + " লিটার";
+        totalValueEl.innerText = formatBangla(maxFuel) + " মিলি";
 
         labelAvailableEl.innerText = "বর্তমান জ্বালানি";
-        availableValueEl.innerText = formatBangla(availableFuel) + " লিটার";
+        availableValueEl.innerText = formatBangla(availableFuel) + " মিলি";
 
         statusEl.innerText = "সিস্টেম চালু আছে...";
     }
@@ -74,10 +72,11 @@ setInterval(() => {
 
 // FETCH DATA EVERY 3 SEC
 function fetchFuelData() {
-    fetch("get_data.php?t=" + new Date().getTime())
+    fetch("/get_fuel?t=" + new Date().getTime())
         .then(res => res.json())
         .then(data => {
-            console.log("Fetched data:", data); // debug
+            console.log("Fetched data:", data);
+
             if (data.total_fuel !== undefined && data.available_fuel !== undefined) {
                 maxFuel = parseInt(data.total_fuel);
                 availableFuel = parseInt(data.available_fuel);
