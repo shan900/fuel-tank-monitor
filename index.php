@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuel Tank Monitor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1 id="title">Fuel Tank Monitor</h1>
+
+        <div class="label" id="labelTotal">Total Fuel</div>
+        <div class="value" id="totalValue">0 L</div>
+
+        <div class="label" id="labelAvailable">Available Fuel</div>
+        <div class="value" id="availableValue">0 L</div>
+
+        <div class="bar">
+            <div class="fill" id="progressBar"></div>
+        </div>
+
+        <div class="footer">
+            <span id="status">System Running...</span>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
