@@ -4,6 +4,9 @@ const sqlite3 = require("sqlite3").verbose();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Serve HTML, CSS, JS files
+app.use(express.static(__dirname));
+
 const db = new sqlite3.Database("fuel.db");
 
 db.run(`
@@ -15,23 +18,18 @@ CREATE TABLE IF NOT EXISTS fuel_status (
 )
 `);
 
-app.get("/", (req, res) => {
-  res.send("Fuel Tank Monitor Running");
-});
-
 app.get("/update_fuel", (req, res) => {
-
-  const total = parseInt(req.query.total_fuel || 1000);
-  const available = parseInt(req.query.available_fuel || 0);
+  const total = parseInt(req.query.total_fuel || "1000");
+  const available = parseInt(req.query.available_fuel || "0");
 
   db.run(
     "INSERT INTO fuel_status(total_fuel, available_fuel) VALUES(?, ?)",
     [total, available],
-    function(err) {
-
-      if(err){
+    function (err) {
+      if (err) {
         return res.json({
-          status: "error"
+          status: "error",
+          message: err.message
         });
       }
 
@@ -40,30 +38,38 @@ app.get("/update_fuel", (req, res) => {
         total_fuel: total,
         available_fuel: available
       });
-
     }
   );
-
 });
 
 app.get("/get_fuel", (req, res) => {
-
   db.get(
-    "SELECT * FROM fuel_status ORDER BY id DESC LIMIT 1",
+    "SELECT total_fuel, available_fuel, created_at FROM fuel_status ORDER BY id DESC LIMIT 1",
     [],
     (err, row) => {
-
-      if(err){
+      if (err) {
         return res.json({
-          status: "error"
+          status: "error",
+          message: err.message
         });
       }
 
-      res.json(row);
+      if (!row) {
+        return res.json({
+          status: "success",
+          total_fuel: 1000,
+          available_fuel: 0
+        });
+      }
 
+      res.json({
+        status: "success",
+        total_fuel: row.total_fuel,
+        available_fuel: row.available_fuel,
+        created_at: row.created_at
+      });
     }
   );
-
 });
 
 app.listen(PORT, () => {
