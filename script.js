@@ -46,7 +46,7 @@ function translateUI() {
         totalValueEl.innerText = formatBangla(maxFuel) + " মি.লি.";
 
         labelAvailableEl.innerText = "বর্তমান জ্বালানি";
-        availableValueEl.innerText = formatBangla(availableFuel) + "মি.লি.";
+        availableValueEl.innerText = formatBangla(availableFuel) + " মি.লি.";
 
         statusEl.innerText = "সিস্টেম চালু আছে...";
     }
