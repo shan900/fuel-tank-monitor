@@ -34,19 +34,19 @@ function translateUI() {
     if (currentLang === "en") {
         titleEl.innerText = "Fuel Tank Monitor";
         labelTotalEl.innerText = "Total Fuel";
-        totalValueEl.innerText = formatLiters(maxFuel) + " L";
+        totalValueEl.innerText = formatLiters(maxFuel) + " ml";
 
         labelAvailableEl.innerText = "Available Fuel";
-        availableValueEl.innerText = formatLiters(availableFuel) + " L";
+        availableValueEl.innerText = formatLiters(availableFuel) + " ml";
 
         statusEl.innerText = "System Running...";
     } else {
         titleEl.innerText = "জ্বালানি ট্যাংক মনিটর";
         labelTotalEl.innerText = "মোট জ্বালানি";
-        totalValueEl.innerText = formatBangla(maxFuel) + " লিটার";
+        totalValueEl.innerText = formatBangla(maxFuel) + " মি.লি.";
 
         labelAvailableEl.innerText = "বর্তমান জ্বালানি";
-        availableValueEl.innerText = formatBangla(availableFuel) + " লিটার";
+        availableValueEl.innerText = formatBangla(availableFuel) + "মি.লি.";
 
         statusEl.innerText = "সিস্টেম চালু আছে...";
     }
