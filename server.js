@@ -179,3 +179,30 @@ app.get("/vehicle_stats", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
+
+/* =========================
+   RESET VEHICLE DATA
+========================= */
+app.get("/reset_vehicle", (req, res) => {
+
+  db.run(
+    "DELETE FROM vehicle_count",
+    [],
+    function(err){
+
+      if(err){
+        return res.json({
+          status: "error",
+          message: err.message
+        });
+      }
+
+      res.json({
+        status: "success",
+        message: "Vehicle data reset"
+      });
+
+    }
+  );
+
+});
