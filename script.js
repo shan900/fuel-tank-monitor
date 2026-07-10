@@ -160,35 +160,41 @@ setInterval(() => {
 
 // FETCH DATA EVERY 3 SEC
 function fetchFuelData() {
-    fetch("get_data.php?t=" + new Date().getTime())
+
+    // Fuel Data
+    fetch("/get_fuel")
         .then(res => res.json())
-        .then(data => {
-            console.log("Fetched data:", data);
+        .then(fuelData => {
 
-            if (data.total_fuel !== undefined && data.available_fuel !== undefined) {
-                maxFuel = parseInt(data.total_fuel);
-                availableFuel = parseInt(data.available_fuel);
+            if (fuelData.total_fuel !== undefined) {
+                maxFuel = parseInt(fuelData.total_fuel);
             }
 
-            if (data.car_count !== undefined) {
-                carCount = parseInt(data.car_count);
+            if (fuelData.available_fuel !== undefined) {
+                availableFuel = parseInt(fuelData.available_fuel);
             }
 
-            if (data.truck_count !== undefined) {
-                truckCount = parseInt(data.truck_count);
-            }
+            // Vehicle Data
+            return fetch("/vehicle_stats");
 
-            if (data.bike_count !== undefined) {
-                bikeCount = parseInt(data.bike_count);
-            }
+        })
+        .then(res => res.json())
+        .then(vehicleData => {
 
-            if (data.bus_count !== undefined) {
-                busCount = parseInt(data.bus_count);
-            }
+            carCount = vehicleData.Car || 0;
+            bikeCount = vehicleData.Bike || 0;
+            busCount = vehicleData.Bus || 0;
+            truckCount = vehicleData.Truck || 0;
 
             translateUI();
+
+            console.log("Vehicle Stats:", vehicleData);
+
         })
-        .catch(err => console.log("Error fetching data:", err));
+        .catch(err => {
+            console.log("Error fetching data:", err);
+        });
+
 }
 
 // INITIAL LOAD
