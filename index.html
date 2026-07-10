@@ -4,46 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuel Tank Monitor</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- Right side vehicle details box -->
+<div class="vehicle-box">
+    <div class="vehicle-header">
+        <h2 id="vehicleTitle">Vehicle Details</h2>
+        <p id="vehicleSubtitle">Live line count</p>
+    </div>
+
+    <div class="vehicle-item">
+        <span class="vehicle-name">
+            <span class="vehicle-icon car-icon">🚗</span>
+            <span id="carLabel">Car</span>
+        </span>
+        <strong id="carCount">0</strong>
+    </div>
+
+    <div class="vehicle-item">
+        <span class="vehicle-name">
+            <span class="vehicle-icon truck-icon">🚚</span>
+            <span id="truckLabel">Truck</span>
+        </span>
+        <strong id="truckCount">0</strong>
+    </div>
+
+    <div class="vehicle-item">
+        <span class="vehicle-name">
+            <span class="vehicle-icon bike-icon">🏍️</span>
+            <span id="bikeLabel">Bike</span>
+        </span>
+        <strong id="bikeCount">0</strong>
+    </div>
+
+    <div class="vehicle-item">
+        <span class="vehicle-name">
+            <span class="vehicle-icon bus-icon">🚌</span>
+            <span id="busLabel">Bus</span>
+        </span>
+        <strong id="busCount">0</strong>
+    </div>
+
+    <div class="vehicle-total">
+        <span id="vehicleTotalLabel">Total</span>
+        <strong id="vehicleTotal">0</strong>
+    </div>
+</div>
+
+<!-- Main fuel tank monitor screen -->
 <div class="container">
-
     <div class="card">
-
         <h1 id="title">Fuel Tank Monitor</h1>
 
-        <div class="label" id="labelTotal">
-            Total Fuel
-        </div>
+        <div class="label" id="labelTotal">Total Fuel</div>
+        <div class="value" id="totalValue">0 L</div>
 
-        <div class="value" id="totalValue">
-            0 ml
-        </div>
-
-        <div class="label" id="labelAvailable">
-            Available Fuel
-        </div>
-
-        <div class="value" id="availableValue">
-            0 ml
-        </div>
+        <div class="label" id="labelAvailable">Available Fuel</div>
+        <div class="value" id="availableValue">0 L</div>
 
         <div class="bar">
             <div class="fill" id="progressBar"></div>
         </div>
 
-        <div class="footer" id="status">
-            System Running...
+        <div class="footer">
+            <span id="status">System Running...</span>
         </div>
-
     </div>
-
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
