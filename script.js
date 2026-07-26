@@ -189,6 +189,25 @@ function translateUI() {
         if (vehicleTotalLabelEl) vehicleTotalLabelEl.innerText = isBn ? "মোট" : "Total";
 
         updateVehicleDisplay();
+        // Update Dashboard Stats even when tank is empty
+if (totalFuelDisplay)
+    totalFuelDisplay.innerHTML = formatLiters(maxFuel) + ' <small>L</small>';
+
+if (availFuelDisplay)
+    availFuelDisplay.innerHTML = formatLiters(availableFuel) + ' <small>L</small>';
+
+if (fuelPercentDisplayStats)
+    fuelPercentDisplayStats.innerHTML = '0 <small>%</small>';
+
+if (fuelChange1) {
+    fuelChange1.textContent = '▼ Empty';
+    fuelChange1.className = 'stat-change negative';
+}
+
+if (fuelChange2) {
+    fuelChange2.textContent = '▼ Empty';
+    fuelChange2.className = 'stat-change negative';
+}
         return;
     }
 
