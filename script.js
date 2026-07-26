@@ -1,148 +1,80 @@
-// SETTINGS
+// ============================================================
+//  SETTINGS
+// ============================================================
 let maxFuel = 0;
 let availableFuel = 0;
 let currentLang = "en";
 let intervalTime = 2000; // 2 sec language switch
 
-// VEHICLE COUNT SETTINGS
 let carCount = 0;
 let truckCount = 0;
 let bikeCount = 0;
 let busCount = 0;
+let temperature = 0;
 
-// TRANSLATE & UPDATE UI
-function translateUI() {
-    let percent = maxFuel > 0 ? (availableFuel / maxFuel) * 100 : 0;
+// ============================================================
+//  DOM REFS (cached for performance)
+// ============================================================
+const $ = id => document.getElementById(id);
 
-    const titleEl = document.getElementById("title");
-    const labelTotalEl = document.getElementById("labelTotal");
-    const totalValueEl = document.getElementById("totalValue");
-    const labelAvailableEl = document.getElementById("labelAvailable");
-    const availableValueEl = document.getElementById("availableValue");
-    const progressBarEl = document.getElementById("progressBar");
-    const statusEl = document.getElementById("status");
+// Fuel card elements
+const titleEl = $("title");
+const labelTotalEl = $("labelTotal");
+const totalValueEl = $("totalValue");
+const labelAvailableEl = $("labelAvailable");
+const availableValueEl = $("availableValue");
+const progressBarEl = $("progressBar");
+const statusEl = $("status");
+const fuelPercentDisplay = $("fuelPercent");
+const statusDotEl = $("statusDot");
+const langBadgeEl = $("langBadge");
 
-    const vehicleTitleEl = document.getElementById("vehicleTitle");
-    const carLabelEl = document.getElementById("carLabel");
-    const truckLabelEl = document.getElementById("truckLabel");
-    const bikeLabelEl = document.getElementById("bikeLabel");
-    const busLabelEl = document.getElementById("busLabel");
-    const vehicleTotalLabelEl = document.getElementById("vehicleTotalLabel");
+// Vehicle elements
+const vehicleTitleEl = $("vehicleTitle");
+const carLabelEl = $("carLabel");
+const truckLabelEl = $("truckLabel");
+const bikeLabelEl = $("bikeLabel");
+const busLabelEl = $("busLabel");
+const vehicleTotalLabelEl = $("vehicleTotalLabel");
+const carCountEl = $("carCount");
+const truckCountEl = $("truckCount");
+const bikeCountEl = $("bikeCount");
+const busCountEl = $("busCount");
+const vehicleTotalEl = $("vehicleTotal");
 
-    // Reset red classes
-    titleEl.classList.remove("red-text");
-    statusEl.classList.remove("red-text");
+// Temperature elements
+const tempValueEl = $("temperatureValue");
+const tempStatusEl = $("tempStatus");
 
-    // Show warning if Available Fuel is zero
-    if (availableFuel <= 0) {
+// Stats elements
+const totalFuelDisplay = $("totalFuelDisplay");
+const availFuelDisplay = $("availFuelDisplay");
+const fuelPercentDisplayStats = $("fuelPercentDisplay");
+const tempDisplay = $("tempDisplay");
+const tempStatusLabel = $("tempStatusLabel");
+const fuelChange1 = $("fuelChange1");
+const fuelChange2 = $("fuelChange2");
 
-        titleEl.innerText = currentLang === "en"
-            ? "Fuel Empty"
-            : "তেল শেষ";
+// Vehicle count display (dashboard)
+const carCountDisplay = $("carCountDisplay");
+const truckCountDisplay = $("truckCountDisplay");
+const bikeCountDisplay = $("bikeCountDisplay");
+const busCountDisplay = $("busCountDisplay");
+const totalVehiclesDisplay = $("totalVehicles");
+const actionTotalVehicles = $("actionTotalVehicles");
+const activeAlertsDisplay = $("activeAlerts");
+const totalRefillsDisplay = $("totalRefills");
+const efficiencyDisplay = $("efficiency");
 
-        titleEl.classList.add("red-text");
+// Clock elements
+const sidebarTime = $("sidebarTime");
+const sidebarDate = $("sidebarDate");
+const liveTime = $("liveTime");
+const liveDate = $("liveDate");
 
-        labelTotalEl.innerText = "";
-        totalValueEl.innerText = "";
-
-        labelAvailableEl.innerText = currentLang === "en"
-            ? "Temporarily Shut Down"
-            : "সাময়িক ভাবে বন্ধ আছে";
-
-        availableValueEl.innerText = "";
-
-        progressBarEl.style.width = "0%";
-
-        statusEl.innerText = currentLang === "en"
-            ? "FUEL EMPTY"
-            : "তেল শেষ";
-
-        statusEl.classList.add("red-text");
-
-        updateVehicleLanguage();
-        updateVehicleDisplay();
-
-        return;
-    }
-
-    if (currentLang === "en") {
-        titleEl.innerText = "Fuel Tank Monitor";
-        labelTotalEl.innerText = "Total Fuel";
-        totalValueEl.innerText = formatLiters(maxFuel) + " L";
-
-        labelAvailableEl.innerText = "Available Fuel";
-        availableValueEl.innerText = formatLiters(availableFuel) + " L";
-
-        statusEl.innerText = "System Running...";
-
-        vehicleTitleEl.innerText = "Vehicle Details";
-        carLabelEl.innerText = "Car";
-        truckLabelEl.innerText = "Truck";
-        bikeLabelEl.innerText = "Bike";
-        busLabelEl.innerText = "Bus";
-        vehicleTotalLabelEl.innerText = "Total";
-    } else {
-        titleEl.innerText = "জ্বালানি ট্যাংক মনিটর";
-        labelTotalEl.innerText = "মোট জ্বালানি";
-        totalValueEl.innerText = formatBangla(maxFuel) + " লিটার";
-
-        labelAvailableEl.innerText = "বর্তমান জ্বালানি";
-        availableValueEl.innerText = formatBangla(availableFuel) + " লিটার";
-
-        statusEl.innerText = "সিস্টেম চালু আছে...";
-
-        vehicleTitleEl.innerText = "গাড়ির বিবরণ";
-        carLabelEl.innerText = "কার";
-        truckLabelEl.innerText = "ট্রাক";
-        bikeLabelEl.innerText = "বাইক";
-        busLabelEl.innerText = "বাস";
-        vehicleTotalLabelEl.innerText = "মোট";
-    }
-
-    progressBarEl.style.width = percent + "%";
-
-    updateVehicleDisplay();
-}
-
-// UPDATE VEHICLE LANGUAGE WHEN FUEL EMPTY
-function updateVehicleLanguage() {
-    if (currentLang === "en") {
-        document.getElementById("vehicleTitle").innerText = "Vehicle Details";
-        document.getElementById("carLabel").innerText = "Car";
-        document.getElementById("truckLabel").innerText = "Truck";
-        document.getElementById("bikeLabel").innerText = "Bike";
-        document.getElementById("busLabel").innerText = "Bus";
-        document.getElementById("vehicleTotalLabel").innerText = "Total";
-    } else {
-        document.getElementById("vehicleTitle").innerText = "গাড়ির বিবরণ";
-        document.getElementById("carLabel").innerText = "কার";
-        document.getElementById("truckLabel").innerText = "ট্রাক";
-        document.getElementById("bikeLabel").innerText = "বাইক";
-        document.getElementById("busLabel").innerText = "বাস";
-        document.getElementById("vehicleTotalLabel").innerText = "মোট";
-    }
-}
-
-// UPDATE VEHICLE DISPLAY
-function updateVehicleDisplay() {
-    let totalVehicle = carCount + truckCount + bikeCount + busCount;
-
-    if (currentLang === "en") {
-        document.getElementById("carCount").innerText = carCount;
-        document.getElementById("truckCount").innerText = truckCount;
-        document.getElementById("bikeCount").innerText = bikeCount;
-        document.getElementById("busCount").innerText = busCount;
-        document.getElementById("vehicleTotal").innerText = totalVehicle;
-    } else {
-        document.getElementById("carCount").innerText = formatBangla(carCount);
-        document.getElementById("truckCount").innerText = formatBangla(truckCount);
-        document.getElementById("bikeCount").innerText = formatBangla(bikeCount);
-        document.getElementById("busCount").innerText = formatBangla(busCount);
-        document.getElementById("vehicleTotal").innerText = formatBangla(totalVehicle);
-    }
-}
-
-// FORMAT NUMBERS
+// ============================================================
+//  HELPERS
+// ============================================================
 function formatLiters(value) {
     return value.toLocaleString('en-US');
 }
@@ -152,51 +84,324 @@ function formatBangla(value) {
     return value.toString().split('').map(d => banglaDigits[d] || d).join('');
 }
 
-// AUTO LANGUAGE SWITCH EVERY 2 SEC
+function getPercent() {
+    return maxFuel > 0 ? (availableFuel / maxFuel) * 100 : 0;
+}
+
+// ============================================================
+//  UPDATE STATUS DOT
+// ============================================================
+function updateStatusDot(percent) {
+    if (!statusDotEl) return;
+    statusDotEl.className = 'status-dot';
+    if (availableFuel <= 0 || percent < 5) {
+        statusDotEl.classList.add('danger');
+    } else if (percent < 25) {
+        statusDotEl.classList.add('warning');
+    }
+}
+
+// ============================================================
+//  UPDATE TEMP STATUS
+// ============================================================
+function updateTempStatus(temp) {
+    if (tempStatusEl) {
+        if (temp >= 35) {
+            tempStatusEl.textContent = 'Critical';
+            tempStatusEl.style.color = '#f87171';
+        } else if (temp >= 30) {
+            tempStatusEl.textContent = 'Warming';
+            tempStatusEl.style.color = '#fbbf24';
+        } else {
+            tempStatusEl.textContent = 'Normal';
+            tempStatusEl.style.color = 'rgba(255,255,255,0.2)';
+        }
+    }
+}
+
+// ============================================================
+//  UPDATE VEHICLE DISPLAY
+// ============================================================
+function updateVehicleDisplay() {
+    const totalVehicle = carCount + truckCount + bikeCount + busCount;
+    const isBn = currentLang === "bn";
+
+    // Left panel vehicle counts
+    if (carCountEl) carCountEl.innerText = isBn ? formatBangla(carCount) : carCount;
+    if (truckCountEl) truckCountEl.innerText = isBn ? formatBangla(truckCount) : truckCount;
+    if (bikeCountEl) bikeCountEl.innerText = isBn ? formatBangla(bikeCount) : bikeCount;
+    if (busCountEl) busCountEl.innerText = isBn ? formatBangla(busCount) : busCount;
+    if (vehicleTotalEl) vehicleTotalEl.innerText = isBn ? formatBangla(totalVehicle) : totalVehicle;
+
+    // Dashboard vehicle counts
+    if (carCountDisplay) carCountDisplay.textContent = carCount;
+    if (truckCountDisplay) truckCountDisplay.textContent = truckCount;
+    if (bikeCountDisplay) bikeCountDisplay.textContent = bikeCount;
+    if (busCountDisplay) busCountDisplay.textContent = busCount;
+    if (totalVehiclesDisplay) totalVehiclesDisplay.textContent = totalVehicle;
+    if (actionTotalVehicles) actionTotalVehicles.textContent = totalVehicle;
+}
+
+// ============================================================
+//  TRANSLATE & UPDATE UI
+// ============================================================
+function translateUI() {
+    const percent = getPercent();
+    const isBn = currentLang === "bn";
+
+    // Update language badge
+    if (langBadgeEl) langBadgeEl.textContent = isBn ? 'বাংলা' : 'EN';
+
+    // Remove red classes
+    if (titleEl) titleEl.classList.remove("red-text");
+    if (statusEl) statusEl.classList.remove("red-text");
+
+    // ----- FUEL EMPTY STATE -----
+    if (availableFuel <= 0) {
+        if (titleEl) {
+            titleEl.innerText = isBn ? "তেল শেষ" : "Fuel Empty";
+            titleEl.classList.add("red-text");
+        }
+
+        if (labelTotalEl) labelTotalEl.innerText = "";
+        if (totalValueEl) totalValueEl.innerText = "";
+        if (labelAvailableEl) {
+            labelAvailableEl.innerText = isBn ? "সাময়িক বন্ধ" : "Temporarily Shut Down";
+        }
+        if (availableValueEl) availableValueEl.innerText = "";
+
+        if (progressBarEl) progressBarEl.style.width = "0%";
+        if (fuelPercentDisplay) fuelPercentDisplay.textContent = "0%";
+
+        if (statusEl) {
+            statusEl.innerText = isBn ? "⛔ তেল শেষ" : "⛔ FUEL EMPTY";
+            statusEl.classList.add("red-text");
+        }
+
+        if (statusDotEl) statusDotEl.className = 'status-dot danger';
+
+        // Vehicle labels
+        if (vehicleTitleEl) vehicleTitleEl.innerText = isBn ? "গাড়ির বিবরণ" : "Vehicle Details";
+        if (carLabelEl) carLabelEl.innerText = isBn ? "কার" : "Car";
+        if (truckLabelEl) truckLabelEl.innerText = isBn ? "ট্রাক" : "Truck";
+        if (bikeLabelEl) bikeLabelEl.innerText = isBn ? "বাইক" : "Bike";
+        if (busLabelEl) busLabelEl.innerText = isBn ? "বাস" : "Bus";
+        if (vehicleTotalLabelEl) vehicleTotalLabelEl.innerText = isBn ? "মোট" : "Total";
+
+        updateVehicleDisplay();
+        return;
+    }
+
+    // ----- NORMAL STATE -----
+    if (!isBn) {
+        // Fuel card
+        if (titleEl) titleEl.innerText = "Fuel Monitor";
+        if (labelTotalEl) labelTotalEl.innerText = "Total Fuel";
+        if (totalValueEl) totalValueEl.innerHTML = formatLiters(maxFuel) + ' <small>L</small>';
+        if (labelAvailableEl) labelAvailableEl.innerText = "Available";
+        if (availableValueEl) availableValueEl.innerHTML = formatLiters(availableFuel) + ' <small>L</small>';
+        if (statusEl) {
+            statusEl.innerText = "● System Running";
+            statusEl.classList.remove("red-text");
+        }
+
+        // Vehicle labels
+        if (vehicleTitleEl) vehicleTitleEl.innerText = "Vehicle Details";
+        if (carLabelEl) carLabelEl.innerText = "Car";
+        if (truckLabelEl) truckLabelEl.innerText = "Truck";
+        if (bikeLabelEl) bikeLabelEl.innerText = "Bike";
+        if (busLabelEl) busLabelEl.innerText = "Bus";
+        if (vehicleTotalLabelEl) vehicleTotalLabelEl.innerText = "Total";
+
+        // Stats
+        if (totalFuelDisplay) totalFuelDisplay.innerHTML = formatLiters(maxFuel) + ' <small>L</small>';
+        if (availFuelDisplay) availFuelDisplay.innerHTML = formatLiters(availableFuel) + ' <small>L</small>';
+        if (fuelPercentDisplayStats) fuelPercentDisplayStats.innerHTML = Math.round(percent) + ' <small>%</small>';
+    } else {
+        // Fuel card - Bangla
+        if (titleEl) titleEl.innerText = "জ্বালানি মনিটর";
+        if (labelTotalEl) labelTotalEl.innerText = "মোট জ্বালানি";
+        if (totalValueEl) totalValueEl.innerHTML = formatBangla(maxFuel) + ' <small>লি.</small>';
+        if (labelAvailableEl) labelAvailableEl.innerText = "বর্তমান";
+        if (availableValueEl) availableValueEl.innerHTML = formatBangla(availableFuel) + ' <small>লি.</small>';
+        if (statusEl) {
+            statusEl.innerText = "● সিস্টেম চালু";
+            statusEl.classList.remove("red-text");
+        }
+
+        // Vehicle labels - Bangla
+        if (vehicleTitleEl) vehicleTitleEl.innerText = "গাড়ির বিবরণ";
+        if (carLabelEl) carLabelEl.innerText = "কার";
+        if (truckLabelEl) truckLabelEl.innerText = "ট্রাক";
+        if (bikeLabelEl) bikeLabelEl.innerText = "বাইক";
+        if (busLabelEl) busLabelEl.innerText = "বাস";
+        if (vehicleTotalLabelEl) vehicleTotalLabelEl.innerText = "মোট";
+
+        // Stats - Bangla
+        if (totalFuelDisplay) totalFuelDisplay.innerHTML = formatBangla(maxFuel) + ' <small>লি.</small>';
+        if (availFuelDisplay) availFuelDisplay.innerHTML = formatBangla(availableFuel) + ' <small>লি.</small>';
+        if (fuelPercentDisplayStats) fuelPercentDisplayStats.innerHTML = formatBangla(Math.round(percent)) + ' <small>%</small>';
+    }
+
+    // Progress bar
+    const clampedPercent = Math.min(100, Math.max(0, percent));
+    if (progressBarEl) {
+        progressBarEl.style.width = clampedPercent + "%";
+        progressBarEl.className = "fill";
+        if (clampedPercent < 20) progressBarEl.classList.add("low");
+        else if (clampedPercent < 50) progressBarEl.classList.add("medium");
+        else progressBarEl.classList.add("high");
+    }
+    if (fuelPercentDisplay) fuelPercentDisplay.textContent = Math.round(clampedPercent) + "%";
+
+    updateStatusDot(clampedPercent);
+    updateVehicleDisplay();
+}
+
+// ============================================================
+//  UPDATE CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const dateShort = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+
+    if (liveTime) liveTime.textContent = timeStr;
+    if (liveDate) liveDate.textContent = dateStr;
+    if (sidebarTime) sidebarTime.textContent = timeStr;
+    if (sidebarDate) sidebarDate.textContent = dateShort;
+}
+
+// ============================================================
+//  UPDATE TEMPERATURE DISPLAY
+// ============================================================
+function updateTemperatureDisplay() {
+    if (tempValueEl) {
+        tempValueEl.innerText = temperature.toFixed(1) + "°C";
+        tempValueEl.className = "temperature-value";
+        if (temperature >= 35) {
+            tempValueEl.classList.add("temp-danger");
+        } else if (temperature >= 30) {
+            tempValueEl.classList.add("temp-warning");
+        } else {
+            tempValueEl.classList.add("temp-normal");
+        }
+        updateTempStatus(temperature);
+    }
+
+    if (tempDisplay) {
+        tempDisplay.innerHTML = temperature.toFixed(1) + ' <small>°C</small>';
+    }
+
+    if (tempStatusLabel) {
+        if (temperature >= 35) {
+            tempStatusLabel.textContent = 'CRITICAL';
+            tempStatusLabel.style.color = '#f87171';
+            tempStatusLabel.className = 'stat-change negative';
+        } else if (temperature >= 30) {
+            tempStatusLabel.textContent = 'WARMING';
+            tempStatusLabel.style.color = '#fbbf24';
+            tempStatusLabel.className = 'stat-change neutral';
+        } else {
+            tempStatusLabel.textContent = 'NORMAL';
+            tempStatusLabel.style.color = '#34d399';
+            tempStatusLabel.className = 'stat-change positive';
+        }
+    }
+}
+
+// ============================================================
+//  UPDATE TREND BARS
+// ============================================================
+function updateTrendBars(percent) {
+    const trendBars = document.querySelectorAll('.trend-bar');
+    if (trendBars.length >= 5) {
+        const values = [
+            Math.min(100, percent),
+            Math.min(100, percent * 0.75),
+            Math.min(100, percent * 0.5),
+            Math.min(100, percent * 0.25),
+            0
+        ];
+        trendBars.forEach((bar, i) => {
+            bar.style.width = values[i] + '%';
+            const item = bar.closest('.trend-item');
+            if (item) {
+                const valSpan = item.querySelector('.trend-value');
+                if (valSpan) valSpan.textContent = Math.round(values[i]) + '%';
+            }
+        });
+    }
+}
+
+// ============================================================
+//  FETCH DATA
+// ============================================================
+function fetchFuelData() {
+    fetch("get_data.php?t=" + new Date().getTime())
+        .then(res => {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log("Fetched data:", data);
+
+            if (data.total_fuel !== undefined && data.available_fuel !== undefined) {
+                maxFuel = parseInt(data.total_fuel) || 0;
+                availableFuel = parseInt(data.available_fuel) || 0;
+            }
+
+            if (data.temperature !== undefined) {
+                temperature = parseFloat(data.temperature) || 0;
+                updateTemperatureDisplay();
+            }
+
+            if (data.car_count !== undefined) carCount = parseInt(data.car_count) || 0;
+            if (data.truck_count !== undefined) truckCount = parseInt(data.truck_count) || 0;
+            if (data.bike_count !== undefined) bikeCount = parseInt(data.bike_count) || 0;
+            if (data.bus_count !== undefined) busCount = parseInt(data.bus_count) || 0;
+
+            // Update random stat changes
+            const change1 = (Math.random() * 6 - 2).toFixed(1);
+            const change2 = (Math.random() * 4 - 1.5).toFixed(1);
+            if (fuelChange1) {
+                fuelChange1.textContent = (parseFloat(change1) >= 0 ? '▲ ' : '▼ ') + Math.abs(parseFloat(change1)).toFixed(1) + '%';
+                fuelChange1.className = 'stat-change ' + (parseFloat(change1) >= 0 ? 'positive' : 'negative');
+            }
+            if (fuelChange2) {
+                fuelChange2.textContent = (parseFloat(change2) >= 0 ? '▲ ' : '▼ ') + Math.abs(parseFloat(change2)).toFixed(1) + '%';
+                fuelChange2.className = 'stat-change ' + (parseFloat(change2) >= 0 ? 'positive' : 'negative');
+            }
+
+            // Update overview stats with random variations
+            const totalVehicle = carCount + truckCount + bikeCount + busCount;
+            if (activeAlertsDisplay) activeAlertsDisplay.textContent = Math.floor(Math.random() * 4);
+            if (totalRefillsDisplay) totalRefillsDisplay.textContent = Math.floor(Math.random() * 6);
+            const eff = Math.min(100, Math.max(70, 92 + Math.floor(Math.random() * 10 - 5)));
+            if (efficiencyDisplay) efficiencyDisplay.innerHTML = eff + '<small>%</small>';
+
+            // Update trend bars
+            const percent = maxFuel > 0 ? (availableFuel / maxFuel) * 100 : 0;
+            updateTrendBars(percent);
+
+            translateUI();
+            updateClock();
+        })
+        .catch(err => console.log("Error fetching data:", err));
+}
+
+// ============================================================
+//  AUTO LANGUAGE SWITCH
+// ============================================================
 setInterval(() => {
     currentLang = currentLang === "en" ? "bn" : "en";
     translateUI();
 }, intervalTime);
 
-// FETCH DATA EVERY 3 SEC
-function fetchFuelData() {
-
-    // Fuel Data
-    fetch("/get_fuel")
-        .then(res => res.json())
-        .then(fuelData => {
-
-            if (fuelData.total_fuel !== undefined) {
-                maxFuel = parseInt(fuelData.total_fuel);
-            }
-
-            if (fuelData.available_fuel !== undefined) {
-                availableFuel = parseInt(fuelData.available_fuel);
-            }
-
-            // Vehicle Data
-            return fetch("/vehicle_stats");
-
-        })
-        .then(res => res.json())
-        .then(vehicleData => {
-
-            carCount = vehicleData.Car || 0;
-            bikeCount = vehicleData.Bike || 0;
-            busCount = vehicleData.Bus || 0;
-            truckCount = vehicleData.Truck || 0;
-
-            translateUI();
-
-            console.log("Vehicle Stats:", vehicleData);
-
-        })
-        .catch(err => {
-            console.log("Error fetching data:", err);
-        });
-
-}
-
-// INITIAL LOAD
+// ============================================================
+//  INIT
+// ============================================================
 fetchFuelData();
 setInterval(fetchFuelData, 3000);
+setInterval(updateClock, 1000);
