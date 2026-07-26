@@ -1,79 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fuel Tank Monitor</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- Right side vehicle details box -->
-<div class="vehicle-box">
-    <div class="vehicle-header">
-        <h2 id="vehicleTitle">Vehicle Details</h2>
-        <p id="vehicleSubtitle">Live line count</p>
-    </div>
-
-    <div class="vehicle-item">
-        <span class="vehicle-name">
-            <span class="vehicle-icon car-icon">🚗</span>
-            <span id="carLabel">Car</span>
-        </span>
-        <strong id="carCount">0</strong>
-    </div>
-
-    <div class="vehicle-item">
-        <span class="vehicle-name">
-            <span class="vehicle-icon truck-icon">🚚</span>
-            <span id="truckLabel">Truck</span>
-        </span>
-        <strong id="truckCount">0</strong>
-    </div>
-
-    <div class="vehicle-item">
-        <span class="vehicle-name">
-            <span class="vehicle-icon bike-icon">🏍️</span>
-            <span id="bikeLabel">Bike</span>
-        </span>
-        <strong id="bikeCount">0</strong>
-    </div>
-
-    <div class="vehicle-item">
-        <span class="vehicle-name">
-            <span class="vehicle-icon bus-icon">🚌</span>
-            <span id="busLabel">Bus</span>
-        </span>
-        <strong id="busCount">0</strong>
-    </div>
-
-    <div class="vehicle-total">
-        <span id="vehicleTotalLabel">Total</span>
-        <strong id="vehicleTotal">0</strong>
-    </div>
-</div>
-
-<!-- Main fuel tank monitor screen -->
-<div class="container">
-    <div class="card">
-        <h1 id="title">Fuel Tank Monitor</h1>
-
-        <div class="label" id="labelTotal">Total Fuel</div>
-        <div class="value" id="totalValue">0 L</div>
-
-        <div class="label" id="labelAvailable">Available Fuel</div>
-        <div class="value" id="availableValue">0 L</div>
-
-        <div class="bar">
-            <div class="fill" id="progressBar"></div>
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">⛽</span>
+            <span class="logo-text">Fuel<span>Monitor</span></span>
         </div>
 
-        <div class="footer">
-            <span id="status">System Running...</span>
-        </div>
-    </div>
-</div>
+        <nav class="nav">
+            <div class="nav-section">Dashboard</div>
+            <a href="#" class="nav-link active">
+                <span class="nav-icon">📊</span> Live Monitor
+            </a>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">🚗</span> Vehicles
+            </a>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">📈</span> Analytics
+            </a>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">📋</span> History
+            </a>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">🔔</span> Alerts
+                <span class="badge">2</span>
+            </a>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">📄</span> Reports
+            </a>
 
-<script src="script.js"></script>
+            <div class="nav-section" style="margin-top:24px;">Settings</div>
+            <a href="#" class="nav-link">
+                <span class="nav-icon">⚙️</span> System
+            </a>
+        </nav>
+
+        <div class="sidebar-status">
+            <div class="status-indicator">
+                <span class="dot online"></span> SYSTEM STATUS
+            </div>
+            <span class="status-label">ONLINE</span>
+            <div class="status-time">
+                <span>Last Updated</span>
+                <strong id="sidebarTime">12:31 AM</strong>
+                <span id="sidebarDate">7/27/2026</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1>Dashboard</h1>
+                <span class="breadcrumb">Overview &amp; Summary</span>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-time" id="liveTime">12:31 AM</span>
+                <span class="topbar-date" id="liveDate">7/27/2026</span>
+                <button class="btn-refresh" onclick="fetchFuelData()">⟳</button>
+            </div>
+        </header>
+
+        <!-- ===== STATS ROW ===== -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">FUEL LEVEL</span>
+                <span class="stat-value" id="totalFuelDisplay">10,000 <small>L</small></span>
+                <span class="stat-change positive" id="fuelChange1">▲ 5.2%</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">AVAILABLE FUEL</span>
+                <span class="stat-value" id="availFuelDisplay">7,500 <small>L</small></span>
+                <span class="stat-change positive" id="fuelChange2">▲ 2.1%</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">AVAILABLE</span>
+                <span class="stat-value" id="fuelPercentDisplay">75 <small>%</small></span>
+                <span class="stat-change neutral">● Stable</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">TANK TEMP</span>
+                <span class="stat-value" id="tempDisplay">28.6 <small>°C</small></span>
+                <span class="stat-change positive" id="tempStatusLabel">NORMAL</span>
+            </div>
+        </section>
+
+        <!-- ===== TODAY'S OVERVIEW + VEHICLE COUNT ===== -->
+        <section class="overview-grid">
+            <!-- Today's Overview -->
+            <div class="overview-card">
+                <h3>TODAY'S OVERVIEW</h3>
+                <div class="overview-items">
+                    <div class="overview-item">
+                        <span class="ov-label">TOTAL VEHICLES</span>
+                        <span class="ov-value" id="totalVehicles">280</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="ov-label">ACTIVE ALERTS</span>
+                        <span class="ov-value" id="activeAlerts">2</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="ov-label">TOTAL REFILLS</span>
+                        <span class="ov-value" id="totalRefills">3</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="ov-label">EFFICIENCY</span>
+                        <span class="ov-value" id="efficiency">92<small>%</small></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Vehicle Count -->
+            <div class="overview-card vehicle-card">
+                <h3>LIVE VEHICLE COUNT</h3>
+                <div class="vehicle-grid">
+                    <div class="vehicle-count">
+                        <span class="v-icon car">🚗</span>
+                        <span class="v-label">CAR</span>
+                        <span class="v-number" id="carCountDisplay">128</span>
+                    </div>
+                    <div class="vehicle-count">
+                        <span class="v-icon truck">🚚</span>
+                        <span class="v-label">TRUCK</span>
+                        <span class="v-number" id="truckCountDisplay">46</span>
+                    </div>
+                    <div class="vehicle-count">
+                        <span class="v-icon bike">🏍️</span>
+                        <span class="v-label">BIKE</span>
+                        <span class="v-number" id="bikeCountDisplay">87</span>
+                    </div>
+                    <div class="vehicle-count">
+                        <span class="v-icon bus">🚌</span>
+                        <span class="v-label">BUS</span>
+                        <span class="v-number" id="busCountDisplay">19</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== QUICK ACTIONS + TREND ===== -->
+        <section class="bottom-grid">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>QUICK ACTIONS</h3>
+                <div class="action-buttons">
+                    <button class="action-btn primary">⛽ ADD REFILL</button>
+                    <button class="action-btn warning">🔔 ADD ALERT</button>
+                    <button class="action-btn info">📄 VIEW REPORT</button>
+                    <button class="action-btn secondary">📤 EXPORT DATA</button>
+                </div>
+                <div class="action-total">
+                    <span>TOTAL VEHICLES</span>
+                    <strong id="actionTotalVehicles">280</strong>
+                </div>
+            </div>
+
+            <!-- Fuel Level Trend -->
+            <div class="trend-card">
+                <h3>FUEL LEVEL TREND</h3>
+                <div class="trend-bars">
+                    <div class="trend-item">
+                        <span class="trend-label">Today</span>
+                        <div class="trend-bar-wrap">
+                            <div class="trend-bar" style="width:100%;"></div>
+                        </div>
+                        <span class="trend-value">100%</span>
+                    </div>
+                    <div class="trend-item">
+                        <span class="trend-label">Yesterday</span>
+                        <div class="trend-bar-wrap">
+                            <div class="trend-bar" style="width:75%;"></div>
+                        </div>
+                        <span class="trend-value">75%</span>
+                    </div>
+                    <div class="trend-item">
+                        <span class="trend-label">Last Week</span>
+                        <div class="trend-bar-wrap">
+                            <div class="trend-bar" style="width:50%;"></div>
+                        </div>
+                        <span class="trend-value">50%</span>
+                    </div>
+                    <div class="trend-item">
+                        <span class="trend-label">Last Month</span>
+                        <div class="trend-bar-wrap">
+                            <div class="trend-bar" style="width:25%;"></div>
+                        </div>
+                        <span class="trend-value">25%</span>
+                    </div>
+                    <div class="trend-item">
+                        <span class="trend-label">Last Year</span>
+                        <div class="trend-bar-wrap">
+                            <div class="trend-bar" style="width:0%;"></div>
+                        </div>
+                        <span class="trend-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== RECENT ALERTS ===== -->
+        <section class="alerts-section">
+            <h3>RECENT ALERTS</h3>
+            <div class="alerts-list">
+                <div class="alert-item">
+                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-text">Low Fuel Alert</span>
+                    <span class="alert-time">10:30 AM</span>
+                </div>
+                <div class="alert-item">
+                    <span class="alert-icon">🔥</span>
+                    <span class="alert-text">High Temperature</span>
+                    <span class="alert-time">10:15 AM</span>
+                </div>
+                <div class="alert-item">
+                    <span class="alert-icon">✅</span>
+                    <span class="alert-text">Tank Refilled</span>
+                    <span class="alert-time">09:40 AM</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <p>© 2025 Fuel Tank Monitor System. All rights reserved.</p>
+        </footer>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
