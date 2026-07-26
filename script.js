@@ -339,58 +339,41 @@ function updateTrendBars(percent) {
 //  FETCH DATA
 // ============================================================
 function fetchFuelData() {
-    fetch("get_data.php?t=" + new Date().getTime())
-        .then(res => {
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.json();
-        })
-        .then(data => {
-            console.log("Fetched data:", data);
 
-            if (data.total_fuel !== undefined && data.available_fuel !== undefined) {
-                maxFuel = parseInt(data.total_fuel) || 0;
-                availableFuel = parseInt(data.available_fuel) || 0;
-            }
+    Promise.all([
+        fetch("/get_fuel").then(res => res.json()),
+        fetch("/vehicle_stats").then(res => res.json())
+    ])
+    .then(([fuel, vehicle]) => {
 
-            if (data.temperature !== undefined) {
-                temperature = parseFloat(data.temperature) || 0;
-                updateTemperatureDisplay();
-            }
+        console.log(fuel);
+        console.log(vehicle);
 
-            if (data.car_count !== undefined) carCount = parseInt(data.car_count) || 0;
-            if (data.truck_count !== undefined) truckCount = parseInt(data.truck_count) || 0;
-            if (data.bike_count !== undefined) bikeCount = parseInt(data.bike_count) || 0;
-            if (data.bus_count !== undefined) busCount = parseInt(data.bus_count) || 0;
+        maxFuel = parseInt(fuel.total_fuel) || 0;
+        availableFuel = parseInt(fuel.available_fuel) || 0;
+        temperature = parseFloat(fuel.temperature) || 0;
 
-            // Update random stat changes
-            const change1 = (Math.random() * 6 - 2).toFixed(1);
-            const change2 = (Math.random() * 4 - 1.5).toFixed(1);
-            if (fuelChange1) {
-                fuelChange1.textContent = (parseFloat(change1) >= 0 ? '▲ ' : '▼ ') + Math.abs(parseFloat(change1)).toFixed(1) + '%';
-                fuelChange1.className = 'stat-change ' + (parseFloat(change1) >= 0 ? 'positive' : 'negative');
-            }
-            if (fuelChange2) {
-                fuelChange2.textContent = (parseFloat(change2) >= 0 ? '▲ ' : '▼ ') + Math.abs(parseFloat(change2)).toFixed(1) + '%';
-                fuelChange2.className = 'stat-change ' + (parseFloat(change2) >= 0 ? 'positive' : 'negative');
-            }
+        carCount = vehicle.Car || 0;
+        truckCount = vehicle.Truck || 0;
+        bikeCount = vehicle.Bike || 0;
+        busCount = vehicle.Bus || 0;
 
-            // Update overview stats with random variations
-            const totalVehicle = carCount + truckCount + bikeCount + busCount;
-            if (activeAlertsDisplay) activeAlertsDisplay.textContent = Math.floor(Math.random() * 4);
-            if (totalRefillsDisplay) totalRefillsDisplay.textContent = Math.floor(Math.random() * 6);
-            const eff = Math.min(100, Math.max(70, 92 + Math.floor(Math.random() * 10 - 5)));
-            if (efficiencyDisplay) efficiencyDisplay.innerHTML = eff + '<small>%</small>';
+        updateTemperatureDisplay();
 
-            // Update trend bars
-            const percent = maxFuel > 0 ? (availableFuel / maxFuel) * 100 : 0;
-            updateTrendBars(percent);
+        const percent = maxFuel > 0
+            ? (availableFuel / maxFuel) * 100
+            : 0;
 
-            translateUI();
-            updateClock();
-        })
-        .catch(err => console.log("Error fetching data:", err));
+        updateTrendBars(percent);
+        translateUI();
+        updateClock();
+
+    })
+    .catch(err => {
+        console.error("Fetch Error:", err);
+    });
+
 }
-
 // ============================================================
 //  AUTO LANGUAGE SWITCH
 // ============================================================
